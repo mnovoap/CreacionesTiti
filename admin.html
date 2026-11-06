@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Administrar catálogo · Creaciones Titi</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Bolsos, morrales, loncheras, estuches y textiles para el hogar hechos a mano. Líneas infantil, juvenil y hogar, y producción a la medida para marcas y empresas.">
+<meta name="theme-color" content="#FFF8F2">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect x='6' y='8' width='12' height='48' rx='2' fill='%2372A40C'/><rect x='20' y='8' width='12' height='48' rx='2' fill='%23C8203F'/><rect x='34' y='8' width='12' height='48' rx='2' fill='%23F26A0A'/><rect x='48' y='8' width='12' height='48' rx='2' fill='%2318A4E0'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="admin-page">
+<header>
+  <div class="seam" aria-hidden="true"></div>
+  <div class="wrap head">
+    <a class="logo-tag" href="index.html"><img src="img/logo.png" alt="Creaciones Titi"></a>
+    <a class="btn btn-ghost btn-sm" href="index.html" style="margin-left:auto"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>Volver a la tienda</a>
+  </div>
+</header>
+
+<main>
+  <section class="block" style="padding-top:40px">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Administrar catálogo</h2>
+        <p>Agrega productos nuevos con su foto. Aparecen en la tienda para todos tus clientes.</p>
+      </div>
+
+      <div class="tip" id="setupTip" hidden><b>Falta conectar la hoja de Google.</b> Mientras el campo <code>apiUrl</code> de <code>config.js</code> esté vacío, esta página no puede guardar productos y la tienda muestra el catálogo de muestra. Sigue la guía de instalación para conectarla.</div>
+
+      <form class="panel login" id="loginForm" novalidate hidden>
+        <h3 style="margin-bottom:6px">Ingresa tu clave</h3>
+        <p class="hint" style="margin-bottom:16px">Es la clave que escribiste en el código de Google Apps Script.</p>
+        <div class="field">
+          <label for="key">Clave de administración</label>
+          <input id="key" type="password" autocomplete="current-password">
+          <div class="err" id="keyErr"></div>
+        </div>
+        <button class="btn btn-primary" type="submit" style="width:100%" id="loginBtn"><i class="ti ti-lock-open" aria-hidden="true"></i>Entrar</button>
+      </form>
+
+      <div class="admin-grid" id="adminPanel" hidden>
+        <form class="panel" id="adForm" novalidate>
+          <h3 style="margin-bottom:16px">Nuevo producto</h3>
+          <div class="field">
+            <label for="adName">Nombre</label>
+            <input id="adName" placeholder="Lonchera Tropical">
+            <div class="err" id="adNameErr"></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label for="adLine">Línea</label><select id="adLine"></select></div>
+            <div class="field"><label for="adType">Tipo de producto</label><select id="adType"></select></div>
+          </div>
+          <div class="field">
+            <label for="adPrice">Precio de referencia (COP)</label>
+            <input id="adPrice" type="number" min="0" step="500" placeholder="45000">
+            <div class="err" id="adPriceErr"></div>
+          </div>
+          <div class="field">
+            <label for="adDesc">Descripción corta</label>
+            <textarea id="adDesc" placeholder="Térmica por dentro, cierre doble y correa ajustable."></textarea>
+          </div>
+          <div class="field">
+            <label for="adPhoto">Foto <span class="opt">(recomendada)</span></label>
+            <input id="adPhoto" type="file" accept="image/*">
+            <p class="hint">Se reduce automáticamente antes de subirla. Si no subes foto, se usa una ilustración.</p>
+            <img id="adPreview" class="preview-img" alt="" hidden>
+          </div>
+          <label style="display:flex;gap:8px;align-items:center;font-weight:700"><input id="adNew" type="checkbox" style="width:auto"> Marcar como «Nuevo»</label>
+          <button class="btn btn-primary" type="submit" style="width:100%;margin-top:16px" id="adBtn"><i class="ti ti-plus" aria-hidden="true"></i>Agregar producto</button>
+          <div class="status-msg" id="adStatus" role="status"></div>
+        </form>
+
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+            <h3>Productos en la tienda <span class="opt" id="count"></span></h3>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <a class="btn btn-ghost btn-sm" id="sheetLink" href="#" target="_blank" rel="noopener" hidden><i class="ti ti-table" aria-hidden="true"></i>Abrir hoja</a>
+              <button class="btn btn-ghost btn-sm" id="logout" type="button"><i class="ti ti-logout" aria-hidden="true"></i>Salir</button>
+            </div>
+          </div>
+          <p class="hint" style="margin-top:6px">Para cambiar precios, nombres o descripciones, edítalos directamente en la hoja de Google: la tienda se actualiza sola.</p>
+          <div class="admin-filter" id="adFilter"></div>
+          <div id="adList"><p class="loading">Cargando…</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="shared.js"></script>
+<script>
+let clave = "";
+let items = [];
+let adFilter = "Todas";
+let pendingPhoto = null;
+try{ clave = sessionStorage.getItem("titi_admin") || ""; }catch(e){}
+
+$("#adLine").innerHTML = Object.keys(LINES).map(c => `<option>${c}</option>`).join("");
+$("#adType").innerHTML = TYPES.map(c => `<option>${c}</option>`).join("");
+
+function show(view){
+  $("#loginForm").hidden = view !== "login";
+  $("#adminPanel").hidden = view !== "panel";
+}
+
+async function login(k, silent){
+  try{
+    const d = await api.send({accion:"verificar", clave:k});
+    clave = k;
+    try{ sessionStorage.setItem("titi_admin", k); }catch(e){}
+    if (d.hoja){ $("#sheetLink").href = d.hoja; $("#sheetLink").hidden = false; }
+    show("panel"); loadList();
+    return true;
+  }catch(err){
+    if (!silent) $("#keyErr").textContent = err.message === "Clave incorrecta" ? "Esa clave no es correcta." : "No pudimos conectar con la hoja de Google. Revisa el enlace en config.js.";
+    show("login");
+    return false;
+  }
+}
+$("#loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const k = $("#key").value.trim();
+  if (!k){ $("#keyErr").textContent = "Escribe tu clave."; return; }
+  $("#loginBtn").disabled = true;
+  await login(k);
+  $("#loginBtn").disabled = false;
+});
+$("#key").addEventListener("input", () => $("#keyErr").textContent = "");
+$("#logout").onclick = () => { clave = ""; try{ sessionStorage.removeItem("titi_admin"); }catch(e){} $("#key").value = ""; show("login"); };
+
+async function loadList(){
+  $("#adList").innerHTML = `<p class="loading">Cargando…</p>`;
+  try{ items = await api.list(); renderList(); }
+  catch(err){ $("#adList").innerHTML = `<div class="empty"><p>No pudimos leer el catálogo. Intenta de nuevo en un momento.</p></div>`; }
+}
+function renderList(){
+  $("#adFilter").innerHTML = ["Todas", ...Object.keys(LINES)].map(c => `<button class="chip" type="button" aria-pressed="${c===adFilter}" data-c="${c}" style="${LINES[c] ? "--ct:" + LINES[c].fill : ""}">${c}</button>`).join("");
+  const list = items.filter(p => adFilter === "Todas" || p.line === adFilter);
+  $("#count").textContent = `(${items.length})`;
+  $("#adList").innerHTML = list.length ? list.map(p => `
+    <div class="line-item">
+      <div class="thumb" style="${lineVars(p)}">${picture(p)}</div>
+      <div><div class="li-name">${esc(p.name)}</div><div class="li-meta">${esc(p.line)} · ${esc(p.type)} · ${money(p.price)}</div></div>
+      <div class="row-actions">
+        <button class="pill-toggle" type="button" data-new="${esc(p.id)}" aria-pressed="${!!p.isNew}" title="Mostrar la etiqueta Nuevo">Nuevo</button>
+        <button class="btn btn-ghost icon-btn" type="button" data-rm="${esc(p.id)}" aria-label="Eliminar ${esc(p.name)}"><i class="ti ti-trash" aria-hidden="true"></i></button>
+      </div>
+    </div>`).join("")
+    : `<div class="empty"><p>No hay productos en esta línea.</p></div>`;
+}
+$("#adFilter").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (!b) return; adFilter = b.dataset.c; renderList(); });
+$("#adList").addEventListener("click", async e => {
+  const rm = e.target.closest("[data-rm]"), nw = e.target.closest("[data-new]");
+  if (rm){
+    const p = items.find(x => x.id === rm.dataset.rm);
+    if (!confirm(`¿Eliminar «${p.name}» de la tienda?`)) return;
+    rm.disabled = true;
+    try{ await api.send({accion:"eliminar", clave, id:p.id}); items = items.filter(x => x.id !== p.id); renderList(); toast("Producto eliminado"); }
+    catch(err){ rm.disabled = false; toast("No se pudo eliminar: " + err.message); }
+  }
+  if (nw){
+    const p = items.find(x => x.id === nw.dataset.new), value = !p.isNew;
+    nw.disabled = true;
+    try{ await api.send({accion:"actualizar", clave, id:p.id, campos:{nuevo:value}}); p.isNew = value; renderList(); }
+    catch(err){ nw.disabled = false; toast("No se pudo cambiar: " + err.message); }
+  }
+});
+
+function resizeImage(file){
+  return new Promise((res, rej) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, 1200 / Math.max(img.width, img.height));
+      const cv = document.createElement("canvas"); cv.width = Math.round(img.width*k); cv.height = Math.round(img.height*k);
+      const ctx = cv.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0,0,cv.width,cv.height);
+      ctx.drawImage(img, 0, 0, cv.width, cv.height);
+      URL.revokeObjectURL(url); res(cv.toDataURL("image/jpeg", .84));
+    };
+    img.onerror = () => rej(new Error("imagen"));
+    img.src = url;
+  });
+}
+$("#adPhoto").addEventListener("change", async e => {
+  const f = e.target.files[0]; if (!f){ pendingPhoto = null; $("#adPreview").hidden = true; return; }
+  try{ pendingPhoto = await resizeImage(f); $("#adPreview").src = pendingPhoto; $("#adPreview").hidden = false; }
+  catch(err){ pendingPhoto = null; toast("No pudimos leer esa imagen. Prueba con JPG o PNG."); }
+});
+$("#adForm").addEventListener("input", e => { const err = document.getElementById(e.target.id + "Err"); if (err) err.textContent = ""; });
+$("#adForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const name = $("#adName").value.trim(), price = Number($("#adPrice").value);
+  let ok = true;
+  if (!name){ $("#adNameErr").textContent = "Escribe el nombre del producto."; ok = false; }
+  if (!price || price <= 0){ $("#adPriceErr").textContent = "Escribe un precio mayor que cero."; ok = false; }
+  if (!ok) return;
+  const btn = $("#adBtn"), st = $("#adStatus");
+  btn.disabled = true; st.className = "status-msg"; st.textContent = pendingPhoto ? "Subiendo foto y guardando…" : "Guardando…";
+  try{
+    const d = await api.send({
+      accion:"agregar", clave,
+      producto:{nombre:name, linea:$("#adLine").value, tipo:$("#adType").value, precio:price, descripcion:$("#adDesc").value.trim() || "Hecho a mano en nuestro taller.", nuevo:$("#adNew").checked},
+      foto: pendingPhoto ? pendingPhoto.split(",")[1] : ""
+    });
+    items.unshift(d.producto); renderList();
+    e.target.reset(); pendingPhoto = null; $("#adPreview").hidden = true;
+    st.className = "status-msg ok"; st.textContent = `«${name}» ya está en la tienda.`;
+  }catch(err){
+    st.className = "status-msg bad"; st.textContent = "No se pudo guardar: " + err.message;
+  }
+  btn.disabled = false;
+});
+
+if (!api.ready()){ $("#setupTip").hidden = false; show("none"); }
+else if (clave){ login(clave, true); }
+else { show("login"); }
+</script>
+</body>
+</html>
